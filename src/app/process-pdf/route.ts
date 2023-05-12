@@ -2,7 +2,6 @@ import { NextRequest } from 'next/server';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import url from 'url';
 
-
 export async function POST(request: NextRequest) {
   const { query } = url.parse(request.url, true);
   const existingPdfBytes = await request.arrayBuffer();
