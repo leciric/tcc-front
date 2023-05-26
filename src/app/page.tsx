@@ -4,9 +4,9 @@ import Image from 'next/image';
 import Contract from '../../artifacts/contracts/DocumentAuthentication.sol/DocumentAuthentication.json';
 import { websiteAddress } from '@/shared/config';
 import { ethers } from 'ethers';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useState } from 'react';
 import { createHash } from 'crypto';
-import { toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 
 export default function Home() {
   async function handleAuthenticateDocument(hash: string) {
@@ -107,6 +107,7 @@ export default function Home() {
           </form>
         </section>
       </div>
+      <ToastContainer />
     </main>
   );
 }
