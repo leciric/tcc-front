@@ -1,68 +1,70 @@
-'use client';
-import { Sidebar } from '@/components/Sidebar';
-import Image from 'next/image';
-import Contract from '../../artifacts/contracts/DocumentAuthentication.sol/DocumentAuthentication.json';
-import { websiteAddress } from '@/shared/config';
-import { ethers } from 'ethers';
-import { ChangeEvent, FormEvent, useState } from 'react';
-import { createHash } from 'crypto';
-import { ToastContainer, toast } from 'react-toastify';
+'use client'
+import { Sidebar } from '@/components/Sidebar'
+import Image from 'next/image'
+import Contract from '../../artifacts/contracts/DocumentAuthentication.sol/DocumentAuthentication.json'
+import { websiteAddress } from '@/shared/config'
+import { ethers } from 'ethers'
+import { ChangeEvent, FormEvent, useState } from 'react'
+import { createHash } from 'crypto'
+import { ToastContainer, toast } from 'react-toastify'
 
 export default function Home() {
   async function handleAuthenticateDocument(hash: string) {
     try {
-      const provider = new ethers.providers.JsonRpcProvider();
-      const signer = provider.getSigner();
+      const provider = new ethers.providers.JsonRpcProvider()
+      const signer = provider.getSigner()
       const tokenContract = new ethers.Contract(
         websiteAddress,
         Contract.abi,
         signer,
-      );
+      )
 
-      const encodedHash = Buffer.from(hash, 'hex');
+      const encodedHash = Buffer.from(hash, 'hex')
 
-      await tokenContract.storeHash(`0x${hash.toString()}`);
+      await tokenContract.storeHash(`0x${hash.toString()}`)
 
-      const isHashStored = await tokenContract.verifyHash(encodedHash);
+      const isHashStored = await tokenContract.verifyHash(encodedHash)
+
+      console.log(isHashStored)
     } catch (error) {
-      throw new Error();
+      throw new Error()
     }
   }
 
-  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [pdfFile, setPdfFile] = useState<File | null>(null)
 
   function handlePdfFileChange(event: ChangeEvent<HTMLInputElement>) {
-    setPdfFile(event?.target?.files ? event?.target?.files[0] : null);
+    setPdfFile(event?.target?.files ? event?.target?.files[0] : null)
   }
 
   async function handleSubmit(event: FormEvent) {
     try {
-      event.preventDefault();
-      const formData = new FormData();
+      event.preventDefault()
+      const formData = new FormData()
 
-      const hash = await generateHash();
+      const hash = await generateHash()
 
-      await handleAuthenticateDocument(hash);
-      formData.append('pdfFile', pdfFile!);
+      await handleAuthenticateDocument(hash)
+      formData.append('pdfFile', pdfFile!)
       const response = await fetch(`/process-pdf/?hash=${hash}`, {
         method: 'POST',
         body: formData,
-      });
-      const pdfBlob = await response.blob();
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      window.open(pdfUrl, '_blank');
-      toast.success('Documento autenticado com Sucesso!');
+      })
+      const pdfBlob = await response.blob()
+      const pdfUrl = URL.createObjectURL(pdfBlob)
+      window.open(pdfUrl, '_blank')
+      toast.success('Documento autenticado com Sucesso!')
     } catch {
-      toast.error('Ocorreu um erro ao autenticador o documento!');
+      toast.error('Ocorreu um erro ao autenticador o documento!')
     }
   }
 
   async function generateHash() {
-    const buffer = await pdfFile!.arrayBuffer();
-    const hash = createHash('sha256');
-    hash.update(Buffer.from(buffer));
-    const digest = hash.digest('hex');
-    return digest;
+    const buffer = await pdfFile!.arrayBuffer()
+    const hash = createHash('sha256')
+    hash.update(Buffer.from(buffer))
+    const digest = hash.digest('hex')
+    return digest
   }
 
   return (
@@ -109,5 +111,5 @@ export default function Home() {
       </div>
       <ToastContainer />
     </main>
-  );
+  )
 }
