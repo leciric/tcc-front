@@ -1,5 +1,7 @@
 import React from 'react'
 import './globals.css'
+import { Sidebar } from '@/components/Sidebar'
+import Image from 'next/image'
 
 export const metadata = {
   title: 'Create Next App',
@@ -13,7 +15,23 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="flex flex-row bg-slate-100">
+      <Sidebar></Sidebar>
+      <div className="w-full h-screen ">
+      <header className="px-2 py-3 flex justify-end items-center shadow-md bg-white">
+          <span className="mr-3">Olá José</span>
+          <Image
+            src="https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
+            alt="User"
+            width="256"
+            height="256"
+            className="rounded-full w-12 h-12 object-cover shadow border-2 border-black"
+          ></Image>
+        </header>
+        {children}
+      </div>
+        
+        </body>
     </html>
   )
 }

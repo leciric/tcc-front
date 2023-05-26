@@ -6,8 +6,66 @@ import { websiteAddress } from '@/shared/config'
 import { ethers } from 'ethers'
 import { ChangeEvent, FormEvent, useState } from 'react'
 import { createHash } from 'crypto'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Controller, useForm } from 'react-hook-form'
+
+import Select from 'react-select'
+
+
+const authenticateDocumentFormSchema = z.object({
+  document_type: z.string()
+    .nonempty('O tipo de documento é obrigatório')
+    .refine(item => documentTypes.map(type => type.value).includes(item)),
+  file: z
+    .any()
+    .transform((list) => list.item(0)!)
+    .refine(file => file?.length == 1, 'O documento é obrigatório')
+    .refine(
+      (file) => file?.size <= 1024 * 1024,
+      'O arquivo precisa ter no máximo 5Mb',
+    ),
+})
+
+type AuthenticateDocumentFormData = z.infer<typeof authenticateDocumentFormSchema>
+
+
+const documentTypes = [
+  {
+    "label": "Escritura de imóvel",
+    "value": "PROPERTY_DEED"
+  },
+  {
+    "label": "Testamento",
+    "value": "WILL"
+  },
+  {
+    "label": "Contrato",
+    "value": "CONTRACT"
+  },
+  {
+    "label": "Procuração",
+    "value": "POWER_OF_ATTORNEY"
+  },
+  {
+    "label": "Certidão de nascimento, casamento e óbito",
+    "value": "BIRTH_MARRIAGE_DEATH_CERTIFICATE"
+  }
+]
+
 
 export default function Home() {
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    control,
+  } = useForm<AuthenticateDocumentFormData>({
+    resolver: zodResolver(authenticateDocumentFormSchema),
+  })
+
+
   async function handleAuthenticateDocument(hash: string) {
     try {
       const provider = new ethers.providers.JsonRpcProvider();
@@ -33,8 +91,7 @@ export default function Home() {
     setPdfFile(event?.target?.files ? event?.target?.files[0] : null);
   }
 
-  async function handleSubmit(event: FormEvent) {
-    event.preventDefault();
+  async function handleAuthenticate(data: AuthenticateDocumentFormData) {
     const formData = new FormData();
 
 
@@ -62,47 +119,72 @@ export default function Home() {
   }
 
   return (
-    <main className="flex flex-row bg-slate-100">
-      <Sidebar></Sidebar>
-      <div className="w-full h-screen ">
-        <header className="px-2 py-3 flex justify-end items-center shadow-md bg-white">
-          <span className="mr-3">Olá José</span>
-          <Image
-            src="https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
-            alt="User"
-            width="256"
-            height="256"
-            className="rounded-full w-12 h-12 object-cover shadow border-2 border-black"
-          ></Image>
-        </header>
-        <section className="p-6 flex flex-col flex-1 ">
-          <h1 className="text-xl font-semibold ">Autenticar novo documento</h1>
-          <p className="text-md font-normal">
-            Selecione o documento que deseja autenticar, informe o tipo de
-            documento e autentique o documento
-          </p>
+    <section className="p-6 flex flex-col flex-1 ">
+      <h1 className="text-xl font-semibold ">Autenticar novo documento</h1>
+      <p className="text-md font-normal">
+        Selecione o documento que deseja autenticar, informe o tipo de
+        documento e autentique o documento
+      </p>
 
-          <form className="flex flex-col mt-8 gap-4 items-start">
-            <div className="flex flex-col gap-1 w-64">
-              <label htmlFor="document">Selecione um documento</label>
-              <input type="file" onChange={handlePdfFileChange} />
+      <form onSubmit={handleSubmit(handleAuthenticate)} className="flex flex-col mt-8 gap-4 items-center">
+        <Controller
+          control={control}
+          name="document_type"
+          defaultValue='PROPERTY_DEED'
+          render={({ field: { onChange, value } }) => (
+            <div className="flex flex-col gap-4 w-64  ">
+              <label htmlFor="document_type">Selecione o tipo de documento</label>
+              <Select
+                theme={(theme) => ({
+                  ...theme,
+                  borderRadius: 8,
+                  colors: {
+                    ...theme.colors,
+                    text: 'orangered',
+                    primary25: '#fed7aa',
+                    primary: '#f97316',
+                  },
+                })}
+                value={documentTypes.filter(current => value?.includes(current.value))}
+                onChange={item => onChange(item?.value)}
+                options={documentTypes}
+              />
+              {errors.document_type && (
+                <span className="text-sm text-red-500">
+                  {errors.document_type.message}
+                </span>
+              )}
             </div>
 
-            <div className="flex flex-col gap-1 w-64">
-              <label htmlFor="type">Tipo de documento</label>
-              <input type="text" className="w-full h-12" />
-            </div>
 
-            <button
-              className="border-none shadow rounded-md 
+          )}
+        />
+
+        <div className="flex flex-col gap-4 w-64  ">
+
+          <label htmlFor="document">Selecione um documento</label>
+          <input type="file"
+            {...register('file')}
+          />
+          {errors.file && (
+            <span className="text-sm text-red-500">
+
+              {/* @ts-ignore */}
+              {errors.file.message}
+            </span>
+          )}
+
+        </div>
+
+
+        <button
+          className="border-none shadow rounded-md 
             text-bold w-fit py-2 px-4 bg-orange-400 text-white self-center mt-4"
-              onClick={handleSubmit}
-            >
-              Autenticar
-            </button>
-          </form>
-        </section>
-      </div>
-    </main>
+
+        >
+          Autenticar
+        </button>
+      </form>
+    </section>
   )
 }
