@@ -1,28 +1,30 @@
-"use client"
-import { Sidebar } from '@/components/Sidebar'
-import Image from 'next/image'
-import Contract from '../../artifacts/contracts/DocumentAuthentication.sol/DocumentAuthentication.json'
-import { websiteAddress } from '@/shared/config'
-import { ethers } from 'ethers'
-import { ChangeEvent, FormEvent, useState } from 'react'
-import { createHash } from 'crypto'
+'use client';
+import { Sidebar } from '@/components/Sidebar';
+import Image from 'next/image';
+import Contract from '../../artifacts/contracts/DocumentAuthentication.sol/DocumentAuthentication.json';
+import { websiteAddress } from '@/shared/config';
+import { ethers } from 'ethers';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { createHash } from 'crypto';
+import { toast } from 'react-toastify';
 
 export default function Home() {
   async function handleAuthenticateDocument(hash: string) {
     try {
       const provider = new ethers.providers.JsonRpcProvider();
       const signer = provider.getSigner();
-      const tokenContract = new ethers.Contract(websiteAddress, Contract.abi, signer);
+      const tokenContract = new ethers.Contract(
+        websiteAddress,
+        Contract.abi,
+        signer,
+      );
 
       const encodedHash = Buffer.from(hash, 'hex');
 
       await tokenContract.storeHash(`0x${hash.toString()}`);
 
       const isHashStored = await tokenContract.verifyHash(encodedHash);
-
-      console.log(isHashStored, 'Documento autenticado com sucesso, e validado na blockchain')
     } catch (error) {
-      console.log(error)
       throw new Error();
     }
   }
@@ -34,13 +36,13 @@ export default function Home() {
   }
 
   async function handleSubmit(event: FormEvent) {
-    event.preventDefault();
-    const formData = new FormData();
+    try {
+      event.preventDefault();
+      const formData = new FormData();
 
+      const hash = await generateHash();
 
-    const hash = await generateHash();
-
-    handleAuthenticateDocument(hash).then(async () => {
+      await handleAuthenticateDocument(hash);
       formData.append('pdfFile', pdfFile!);
       const response = await fetch(`/process-pdf/?hash=${hash}`, {
         method: 'POST',
@@ -49,9 +51,11 @@ export default function Home() {
       const pdfBlob = await response.blob();
       const pdfUrl = URL.createObjectURL(pdfBlob);
       window.open(pdfUrl, '_blank');
-    }).catch(error => window.alert("Ocorreu um erro ao validar o documento na blockchain"));
-
-  };
+      toast.success('Documento autenticado com Sucesso!');
+    } catch {
+      toast.error('Ocorreu um erro ao autenticador o documento!');
+    }
+  }
 
   async function generateHash() {
     const buffer = await pdfFile!.arrayBuffer();
@@ -104,5 +108,5 @@ export default function Home() {
         </section>
       </div>
     </main>
-  )
+  );
 }
