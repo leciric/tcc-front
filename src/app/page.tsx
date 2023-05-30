@@ -1,60 +1,60 @@
-"use client"
-import { Sidebar } from '@/components/Sidebar'
-import Image from 'next/image'
+'use client'
 import Contract from '../../artifacts/contracts/DocumentAuthentication.sol/DocumentAuthentication.json'
 import { websiteAddress } from '@/shared/config'
 import { ethers } from 'ethers'
-import { ChangeEvent, FormEvent, useState } from 'react'
 import { createHash } from 'crypto'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
-
+import { ToastContainer, toast } from 'react-toastify'
 import Select from 'react-select'
 
+import { useRouter } from 'next/navigation'
 
 const authenticateDocumentFormSchema = z.object({
-  document_type: z.string()
+  document_type: z
+    .string()
     .nonempty('O tipo de documento é obrigatório')
-    .refine(item => documentTypes.map(type => type.value).includes(item)),
+    .refine((item) => documentTypes.map((type) => type.value).includes(item)),
   file: z
     .any()
     .transform((list) => list.item(0)!)
-    .refine(file => file?.length == 1, 'O documento é obrigatório')
+    .refine((file) => file?.length !== 1, 'O documento é obrigatório')
     .refine(
       (file) => file?.size <= 1024 * 1024,
       'O arquivo precisa ter no máximo 5Mb',
     ),
 })
 
-type AuthenticateDocumentFormData = z.infer<typeof authenticateDocumentFormSchema>
-
+type AuthenticateDocumentFormData = z.infer<
+  typeof authenticateDocumentFormSchema
+>
 
 const documentTypes = [
   {
-    "label": "Escritura de imóvel",
-    "value": "PROPERTY_DEED"
+    label: 'Escritura de imóvel',
+    value: 'PROPERTY_DEED',
   },
   {
-    "label": "Testamento",
-    "value": "WILL"
+    label: 'Testamento',
+    value: 'WILL',
   },
   {
-    "label": "Contrato",
-    "value": "CONTRACT"
+    label: 'Contrato',
+    value: 'CONTRACT',
   },
   {
-    "label": "Procuração",
-    "value": "POWER_OF_ATTORNEY"
+    label: 'Procuração',
+    value: 'POWER_OF_ATTORNEY',
   },
   {
-    "label": "Certidão de nascimento, casamento e óbito",
-    "value": "BIRTH_MARRIAGE_DEATH_CERTIFICATE"
-  }
+    label: 'Certidão de nascimento, casamento e óbito',
+    value: 'BIRTH_MARRIAGE_DEATH_CERTIFICATE',
+  },
 ]
 
-
-export default function Home() {
+export default function AuthenticateDocument() {
+  const router = useRouter()
 
   const {
     register,
@@ -65,75 +65,82 @@ export default function Home() {
     resolver: zodResolver(authenticateDocumentFormSchema),
   })
 
-
   async function handleAuthenticateDocument(hash: string) {
     try {
-      const provider = new ethers.providers.JsonRpcProvider();
-      const signer = provider.getSigner();
-      const tokenContract = new ethers.Contract(websiteAddress, Contract.abi, signer);
+      const provider = new ethers.providers.JsonRpcProvider()
+      const signer = provider.getSigner()
+      const tokenContract = new ethers.Contract(
+        websiteAddress,
+        Contract.abi,
+        signer,
+      )
 
-      const encodedHash = Buffer.from(hash, 'hex');
+      const encodedHash = Buffer.from(hash, 'hex')
 
-      await tokenContract.storeHash(`0x${hash.toString()}`);
+      await tokenContract.storeHash(`0x${hash.toString()}`)
 
-      const isHashStored = await tokenContract.verifyHash(encodedHash);
+      const isHashStored = await tokenContract.verifyHash(encodedHash)
 
-      console.log(isHashStored, 'Documento autenticado com sucesso, e validado na blockchain')
+      if (isHashStored) {
+        router.push(`/success?hash=${encodedHash}`)
+      }
     } catch (error) {
-      console.log(error)
-      throw new Error();
+      throw new Error()
     }
   }
 
-  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  async function handleAuthenticate(data: AuthenticateDocumentFormData) {
+    try {
+      const hash = await generateHash(data.file!)
 
-  function handlePdfFileChange(event: ChangeEvent<HTMLInputElement>) {
-    setPdfFile(event?.target?.files ? event?.target?.files[0] : null);
+      await handleAuthenticateDocument(hash)
+
+      // const formData = new FormData()
+      // formData.append('pdfFile', data.file!)
+      // const response = await fetch(`/process-pdf/?hash=${hash}`, {
+      //   method: 'POST',
+      //   body: formData,
+      // })
+      // const pdfBlob = await response.blob()
+      // const pdfUrl = URL.createObjectURL(pdfBlob)
+      // window.open(pdfUrl, '_blank')
+      toast.success('Documento autenticado com Sucesso!')
+
+      router.push('/success', {})
+    } catch (error) {
+      toast.error('Ocorreu um erro ao autenticador o documento!')
+    }
   }
 
-  async function handleAuthenticate(data: AuthenticateDocumentFormData) {
-    const formData = new FormData();
-
-
-    const hash = await generateHash();
-
-    handleAuthenticateDocument(hash).then(async () => {
-      formData.append('pdfFile', pdfFile!);
-      const response = await fetch(`/process-pdf/?hash=${hash}`, {
-        method: 'POST',
-        body: formData,
-      });
-      const pdfBlob = await response.blob();
-      const pdfUrl = URL.createObjectURL(pdfBlob);
-      window.open(pdfUrl, '_blank');
-    }).catch(error => window.alert("Ocorreu um erro ao validar o documento na blockchain"));
-
-  };
-
-  async function generateHash() {
-    const buffer = await pdfFile!.arrayBuffer();
-    const hash = createHash('sha256');
-    hash.update(Buffer.from(buffer));
-    const digest = hash.digest('hex');
-    return digest;
+  async function generateHash(file: any) {
+    const buffer = await file!.arrayBuffer()
+    const hash = createHash('sha256')
+    hash.update(Buffer.from(buffer))
+    const digest = hash.digest('hex')
+    return digest
   }
 
   return (
     <section className="p-6 flex flex-col flex-1 ">
       <h1 className="text-xl font-semibold ">Autenticar novo documento</h1>
       <p className="text-md font-normal">
-        Selecione o documento que deseja autenticar, informe o tipo de
-        documento e autentique o documento
+        Selecione o documento que deseja autenticar, informe o tipo de documento
+        e autentique o documento
       </p>
 
-      <form onSubmit={handleSubmit(handleAuthenticate)} className="flex flex-col mt-8 gap-4 items-center">
+      <form
+        onSubmit={handleSubmit(handleAuthenticate)}
+        className="flex flex-col mt-8 gap-4 items-center"
+      >
         <Controller
           control={control}
           name="document_type"
-          defaultValue='PROPERTY_DEED'
+          defaultValue="PROPERTY_DEED"
           render={({ field: { onChange, value } }) => (
             <div className="flex flex-col gap-4 w-64  ">
-              <label htmlFor="document_type">Selecione o tipo de documento</label>
+              <label htmlFor="document_type">
+                Selecione o tipo de documento
+              </label>
               <Select
                 theme={(theme) => ({
                   ...theme,
@@ -145,8 +152,10 @@ export default function Home() {
                     primary: '#f97316',
                   },
                 })}
-                value={documentTypes.filter(current => value?.includes(current.value))}
-                onChange={item => onChange(item?.value)}
+                value={documentTypes.filter((current) =>
+                  value?.includes(current.value),
+                )}
+                onChange={(item) => onChange(item?.value)}
                 options={documentTypes}
               />
               {errors.document_type && (
@@ -155,36 +164,29 @@ export default function Home() {
                 </span>
               )}
             </div>
-
-
           )}
         />
 
         <div className="flex flex-col gap-4 w-64  ">
-
           <label htmlFor="document">Selecione um documento</label>
-          <input type="file"
-            {...register('file')}
-          />
+          <input type="file" {...register('file')} />
           {errors.file && (
             <span className="text-sm text-red-500">
-
               {/* @ts-ignore */}
               {errors.file.message}
             </span>
           )}
-
         </div>
-
 
         <button
           className="border-none shadow rounded-md 
-            text-bold w-fit py-2 px-4 bg-orange-400 text-white self-center mt-4"
-
+            text-bold w-fit py-2 px-4 bg-orange-500 text-white self-center mt-4 hover:bg-orange-600"
         >
           Autenticar
         </button>
       </form>
+
+      <ToastContainer />
     </section>
   )
 }
