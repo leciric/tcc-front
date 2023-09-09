@@ -7,7 +7,9 @@ export function Sidebar() {
       <div className="flex flex-col gap-6">
         <NavigationItem to="/meus-documentos">Meus documentos</NavigationItem>
         <NavigationItem to="/autenticar">Autenticar documento</NavigationItem>
-        <NavigationItem>Validar documento autenticado</NavigationItem>
+        <NavigationItem to="/validar">
+          Validar documento autenticado
+        </NavigationItem>
         <NavigationItem>Serviços</NavigationItem>
         <NavigationItem>Acabou as opções</NavigationItem>
       </div>
