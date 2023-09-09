@@ -1,6 +1,14 @@
-import 'react-toastify/dist/ReactToastify.css'
+import { Poppins } from 'next/font/google'
+
 import React from 'react'
+import 'react-toastify/dist/ReactToastify.css'
 import './globals.css'
+
+// If loading a variable font, you don't need to specify the font weight
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+})
 
 export const metadata = {
   title: 'Create Next App',
@@ -13,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={poppins.className}>
       <body>{children}</body>
     </html>
   )
