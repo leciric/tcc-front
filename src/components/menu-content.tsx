@@ -1,10 +1,14 @@
-'use client'
+import {
+  DocumentTextIcon,
+  HomeIcon,
+  SparklesIcon,
+} from '@heroicons/react/24/outline'
 
-export function SideBar() {
+export function MenuContent() {
   return (
-    <aside className="fixed left-0 top-0 z-10 hidden h-full w-[300px] max-w-xs flex-col border-r border-r-gray-300 bg-white px-8 py-12 transition-all group-data-[opened=true]:block lg:flex">
+    <div>
       <div className="flex flex-row items-center gap-x-3">
-        <div className="h-12 w-12 rounded-full bg-primary"></div>
+        <SparklesIcon className="h-12 w-12 rounded-full text-primary"></SparklesIcon>
         <p className="text-xl font-bold capitalize">DocGuard</p>
       </div>
 
@@ -13,7 +17,7 @@ export function SideBar() {
           tabIndex={0}
           className="flex w-full cursor-pointer flex-row gap-4 rounded-md p-4 hover:bg-neutral-100"
         >
-          <div className="h-6 w-6 rounded-full bg-gray-900"></div>
+          <HomeIcon className="h-6 w-6"></HomeIcon>
           <p className="text-base ">Meus documentos</p>
         </nav>
 
@@ -21,10 +25,10 @@ export function SideBar() {
           tabIndex={0}
           className="flex w-full cursor-pointer flex-row gap-4 rounded-md p-4 hover:bg-neutral-100"
         >
-          <div className="h-6 w-6 rounded-full bg-gray-900"></div>
+          <DocumentTextIcon className="h-6 w-6"></DocumentTextIcon>
           <p className="text-base ">Autenticar documento</p>
         </nav>
       </div>
-    </aside>
+    </div>
   )
 }
