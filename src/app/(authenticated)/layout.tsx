@@ -32,7 +32,7 @@ export default function RootLayout({
             <div className="flex items-center justify-center gap-6">
               <input
                 type="text"
-                className="rounded border border-gray-300 p-2"
+                className="hidden rounded border border-gray-300 p-2 md:block"
                 placeholder="Procurar"
               />
 
