@@ -19,12 +19,12 @@ export default function RootLayout({
 }) {
   const token = cookies().get('doc-guard.token')?.value
 
-  if (token) {
+  if (!token) {
     return redirect('/')
   }
 
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body className={inter.className}>{children} </body>
     </html>
   )
