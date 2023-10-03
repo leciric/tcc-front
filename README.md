@@ -12,6 +12,26 @@ yarn dev
 pnpm dev
 ```
 
+To simulate the blockchain locally run:
+```bash
+npx hardhat node
+```
+and
+
+To deploy the contract in the blockchain run:
+```bash
+npx hardhat run ./scripts/deploy.ts --network localhost
+```
+
+After that set your env:
+
+- Create a file called: .env.local
+- Set the two variables
+
+```bash
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+```
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
