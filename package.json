@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.0.18",
+    "@clerk/localizations": "^1.26.0",
+    "@clerk/nextjs": "^4.24.0",
+    "@clerk/themes": "^1.7.6",
     "@nomiclabs/hardhat-ethers": "^2.2.3",
     "@nomiclabs/hardhat-waffle": "^2.0.5",
     "@openzeppelin/contracts": "^4.8.3",

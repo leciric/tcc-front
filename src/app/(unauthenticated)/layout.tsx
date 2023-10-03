@@ -19,7 +19,7 @@ export default function RootLayout({
 }) {
   const token = cookies().get('doc-guard.token')?.value
 
-  if (!token) {
+  if (token) {
     return redirect('/')
   }
 

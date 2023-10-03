@@ -7,6 +7,7 @@ import { ethers } from 'ethers'
 import { ChangeEvent, FormEvent, useState } from 'react'
 import { createHash } from 'crypto'
 import { ToastContainer, toast } from 'react-toastify'
+import { UserButton } from '@clerk/nextjs'
 
 export default function Home() {
   async function handleAuthenticateDocument(hash: string) {
@@ -29,6 +30,11 @@ export default function Home() {
     } catch (error) {
       throw new Error()
     }
+    return (
+      <div>
+        <UserButton afterSignOutUrl="/sign-in" />
+      </div>
+    )
   }
 
   const [pdfFile, setPdfFile] = useState<File | null>(null)

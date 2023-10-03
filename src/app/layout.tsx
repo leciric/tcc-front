@@ -1,4 +1,7 @@
 import { Poppins } from 'next/font/google'
+import { ClerkProvider } from '@clerk/nextjs'
+import { ptBR } from '@clerk/localizations'
+import { dark } from '@clerk/themes'
 
 import React from 'react'
 import 'react-toastify/dist/ReactToastify.css'
@@ -21,8 +24,14 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="pt-BR" className={poppins.className}>
-      <body>{children}</body>
-    </html>
+    <ClerkProvider localization={ptBR} appearance={{ baseTheme: dark }}>
+      <html lang="pt-br" className={poppins.className}>
+        <body>
+          <div className="flex h-screen items-center justify-center">
+            {children}
+          </div>
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }
