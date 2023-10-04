@@ -1,6 +1,6 @@
 import { authMiddleware } from '@clerk/nextjs'
 export default authMiddleware({
-  publicRoutes: ['/sign-in'],
+  publicRoutes: ['/sign-in', '/sign-up'],
   // Rota pública, o que não for sign in, vai ter protecão do middleware, o usuário tem que estar logado para acessar
 })
 

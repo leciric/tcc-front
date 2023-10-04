@@ -23,9 +23,7 @@ export default async function RootLayout({
     <ClerkProvider localization={ptBR}>
       <html lang="pt-br" className={inter.className}>
         <body>
-          <div className="flex h-screen w-full items-center justify-center">
-            {children}
-          </div>
+          <div className="">{children}</div>
         </body>
       </html>
     </ClerkProvider>
