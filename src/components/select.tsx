@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 'use client'
 
 import * as SelectPrimitive from '@radix-ui/react-select'
