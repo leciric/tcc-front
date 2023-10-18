@@ -1,5 +1,4 @@
 'use client'
-import { Sidebar } from '@/components/Sidebar'
 import { websiteAddress } from '@/shared/config'
 import { UserButton } from '@clerk/nextjs'
 import { createHash } from 'crypto'
@@ -75,7 +74,6 @@ export default function Home() {
 
   return (
     <main className="flex flex-row bg-slate-100">
-      <Sidebar></Sidebar>
       <div className="h-screen w-full ">
         <header className="flex items-center justify-end bg-white px-2 py-3 shadow-md">
           <span className="mr-3">Olá José</span>
