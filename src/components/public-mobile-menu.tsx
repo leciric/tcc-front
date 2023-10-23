@@ -55,7 +55,7 @@ export function PublicMobileMenu() {
                 className="flex w-full cursor-pointer flex-row gap-4 rounded-md p-4 hover:bg-neutral-100"
               >
                 <UserCircleIcon className="h-6 w-6"></UserCircleIcon>
-                <p className="text-base">Sobre-nos</p>
+                <p className="text-base">Sobre nós</p>
               </Link>
             </div>
           </div>

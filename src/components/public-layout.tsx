@@ -26,7 +26,7 @@ export function PublicLayout({ children }: LayoutProps) {
             Preço
           </nav>
           <nav className="cursor-pointer text-center hover:text-primary">
-            Sobre-nos
+            Sobre nós
           </nav>
         </div>
         <div className="hidden items-center justify-center gap-6 lg:flex">
