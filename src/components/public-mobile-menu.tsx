@@ -50,12 +50,12 @@ export function PublicMobileMenu() {
               </Link>
 
               <Link
-                href="/authenticate"
+                href="/politica-de-privacidade"
                 passHref
                 className="flex w-full cursor-pointer flex-row gap-4 rounded-md p-4 hover:bg-neutral-100"
               >
                 <UserCircleIcon className="h-6 w-6"></UserCircleIcon>
-                <p className="text-base">Sobre nós</p>
+                <p className="text-base">Politica de privacidade</p>
               </Link>
             </div>
           </div>

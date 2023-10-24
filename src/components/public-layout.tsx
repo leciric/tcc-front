@@ -2,6 +2,7 @@
 import { ReactNode } from 'react'
 import { Logo } from './logo'
 import { PublicMobileMenu } from './public-mobile-menu'
+import Link from 'next/link'
 
 interface LayoutProps {
   children: ReactNode
@@ -25,9 +26,11 @@ export function PublicLayout({ children }: LayoutProps) {
           <nav className="cursor-pointer text-center hover:text-primary">
             Preço
           </nav>
-          <nav className="cursor-pointer text-center hover:text-primary">
-            Sobre nós
-          </nav>
+          <Link href="/politica-de-privacidade">
+            <nav className="cursor-pointer text-center hover:text-primary">
+              Politica de privacidade
+            </nav>
+          </Link>
         </div>
         <div className="hidden items-center justify-center gap-6 lg:flex">
           <input
