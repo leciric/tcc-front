@@ -13,10 +13,11 @@ export default function Page() {
             <div className="z-10 mt-10 flex w-full flex-col pl-6 xl:w-1/2">
               <h1 className="text-3xl font-bold text-white">Cadastre-se</h1>
               <strong className="mt-3 text-2xl font-semibold text-white">
-                Protegendo o seu mundo, um documento de cada vez.
+                Autentique seus documentos agora de maneira online.
               </strong>
               <p className="mt-4 text-lg text-white ">
-                A segurança de seus documentos está a um clique de distância.
+                2º OFICIAL DE REGISTRO CIVIL DAS PESSOAS NATURAIS DE SOROCABA,
+                ESTADO DE SÃO PAULO
               </p>
             </div>
             <Image
@@ -29,7 +30,7 @@ export default function Page() {
           </div>
 
           <div className="mt-4 lg:mt-16">
-            <SignIn signUpUrl="/sign-up" />
+            <SignIn afterSignInUrl="/my-documents" signUpUrl="/sign-up" />
           </div>
         </div>
       </main>
