@@ -1,3 +1,5 @@
+'use client'
+
 import { Layout } from '@/components/layout'
 import {
   Select,
@@ -6,9 +8,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/select'
+import { createHash } from 'crypto'
 import Image from 'next/image'
 
+import { ChangeEvent, useState } from 'react'
+
 export default function Authenticate() {
+  const [pdfFile, setPdfFile] = useState<File | null>(null)
+
+  function handlePdfFileChange(event: ChangeEvent<HTMLInputElement>) {
+    setPdfFile(event?.target?.files ? event?.target?.files[0] : null)
+  }
+
+  async function generateHash() {
+    const buffer = await pdfFile!.arrayBuffer()
+    const hash = createHash('sha256')
+    hash.update(Buffer.from(buffer))
+    const digest = hash.digest('hex')
+    return digest
+  }
+
+  async function handleSubmit() {
+    const hash = await generateHash()
+
+    console.log(hash)
+  }
   return (
     <Layout>
       <div className="mx-auto mt-4 flex max-w-5xl flex-col gap-y-3">
@@ -48,6 +72,8 @@ export default function Authenticate() {
                 Tipo de documento
               </label>
 
+              <input type="file" onChange={handlePdfFileChange} />
+
               <div
                 tabIndex={0}
                 className="flex h-12 cursor-default items-center justify-center rounded-lg border-2 border-primary bg-white"
@@ -58,7 +84,11 @@ export default function Authenticate() {
               </div>
             </div>
 
-            <button className="mt-6 flex h-12 items-center justify-center rounded-lg bg-primary font-bold text-white">
+            <button
+              onClick={handleSubmit}
+              type="button"
+              className="mt-6 flex h-12 items-center justify-center rounded-lg bg-primary font-bold text-white"
+            >
               AUTENTICAR
             </button>
           </div>
