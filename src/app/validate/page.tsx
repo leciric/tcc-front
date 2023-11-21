@@ -1,13 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { Layout } from '@/components/layout'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/select'
+
 import { api } from '@/services/api'
 import { createHash } from 'crypto'
 import Image from 'next/image'
@@ -17,6 +11,7 @@ import { toast } from 'react-toastify'
 
 export default function Authenticate() {
   const [pdfFile, setPdfFile] = useState<File | null>(null)
+  const [currentHash, setCurrentHash] = useState('')
 
   function handlePdfFileChange(event: ChangeEvent<HTMLInputElement>) {
     setPdfFile(event?.target?.files ? event?.target?.files[0] : null)
@@ -36,22 +31,26 @@ export default function Authenticate() {
     try {
       const hash = await generateHash()
 
-      await api.post<{
-        document: {
-          hash_id: string
-        }
-      }>('/documents', {
-        hash_id: hash,
-        file_name: pdfFile?.name || '',
-        url: pdfFile?.name || '',
-      })
+      if (hash === currentHash) {
+        const response = await api.get<{
+          isValid: boolean
+        }>(`/documents/validate/${hash}`)
 
-      toast.success('Documento autenticado com sucesso!')
-      router.push(`/authenticate/success/${hash}`)
+        if (response.data.isValid) {
+          toast.success('Documento validado com sucesso!')
+          router.push(`/validate/success`)
+        } else {
+          toast.error(
+            'Documento não encontrado em nossos registros na blockchain',
+          )
+        }
+      } else {
+        toast.error('Documento enviado não coincide com o hash fornecido')
+      }
     } catch (error) {
       router.push(`/authenticate/error?type=auth`)
 
-      toast.error('Ocorreu um erro ao fazer a autenticação')
+      toast.error('Ocorreu um erro ao fazer a validação')
     }
   }
   return (
@@ -60,37 +59,35 @@ export default function Authenticate() {
         <form className=" flex w-full flex-col gap-y-2 sm:mx-auto sm:grid sm:grid-cols-2 sm:gap-6">
           <div className="flex max-w-[80%] flex-col gap-y-2 sm:gap-y-4">
             <h1 className="text-xl font-semibold text-secondary">
-              Autenticar documento
+              Validar documento
             </h1>
             <p className="text-secondary">
-              Aqui você consegue autenticar seus documentos apenas preenchendo o
-              formulário a seguir, sem burocracias e sem precisar se locomover
-              para outro lugar
+              Aqui você consegue validar a autenticação de seus documentos
+              apenas preenchendo o formulário a seguir.
             </p>
 
             <strong className="text-secondary">
               Basta preencher os campos a seguir, e pronto seu documento já está
-              autenticado!
+              validado!
             </strong>
           </div>
           <div className="flex flex-col gap-y-2">
-            <div className="mt-6 flex flex-col gap-y-1 sm:mt-0">
-              <label htmlFor="document-type" className="font-bold text-primary">
-                Tipo de documento
+            <div className="flex flex-col gap-y-2">
+              <label
+                htmlFor="document-picker"
+                className=" cursor-pointer text-base font-bold text-primary"
+              >
+                Hash do arquivo
               </label>
-              <Select>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Tipo de documento" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="contract">Contrato</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+              <input
+                type="text"
+                placeholder="Digite o hash do arquivo aqui"
+                className="flex h-12 cursor-default items-center justify-center rounded-lg border-2 border-primary bg-white p-3"
+                onChange={(event) => setCurrentHash(event.target.value)}
+              />
 
-            <div className="flex flex-col gap-y-1">
               <label htmlFor="document-type" className="font-bold text-primary">
-                Tipo de documento
+                Documento
               </label>
 
               <input
@@ -121,7 +118,7 @@ export default function Authenticate() {
                   width={64}
                   height={64}
                 ></Image>
-                <span className=" text-xl font-bold text-primary">10</span>
+                <span className=" text-xl font-bold text-primary">2</span>
               </div>
               <span className=" text-sm font-bold text-primary">
                 Este processo irá custar a quantidade de moedas acima
@@ -133,14 +130,14 @@ export default function Authenticate() {
               type="button"
               className="mt-6 flex h-12 items-center justify-center rounded-lg bg-primary font-bold text-white"
             >
-              AUTENTICAR
+              VALIDAR
             </button>
           </div>
         </form>
 
         <Image
           src="/autenticar.png"
-          alt="Autenticar"
+          alt="Validar"
           width="500"
           height="500"
           className="mx-auto mt-5 w-full max-w-[500px]"

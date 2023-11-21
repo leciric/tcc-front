@@ -9,24 +9,15 @@ export default function Success() {
         <CheckBadgeIcon className="h-40 w-40 text-success"></CheckBadgeIcon>
 
         <h1 className="text-2xl font-semibold text-secondary">
-          Documento autenticado com sucesso!
+          Documento validado com sucesso!
         </h1>
         <p className="text-lg text-secondary">
-          Seu documento gerou o seguinte código:
+          O documento e o hash enviado correspondem ao mesmo arquivo e não houve
+          nenhuma modificação!
         </p>
 
-        <div className="flex h-14 items-center justify-between rounded-lg border border-primary ">
-          <strong className="p-2 text-secondary">
-            E3B0C44298FC1C149AFBF4C8996FB92427AE41E4
-          </strong>
-
-          <button className="flex h-full w-full items-center justify-center bg-primary p-2">
-            <span className="text-lg font-bold text-white">Copiar</span>
-          </button>
-        </div>
-
         <p className="text-center text-lg text-secondary">
-          O hash enviado foi criado com base no documento submetido, e esse
+          O hash enviado foi validado com base no documento submetido, e esse
           documento não passou por nenhuma modificação.
         </p>
 

@@ -42,14 +42,15 @@ export function MenuContent() {
           <DocumentTextIcon className="h-6 w-6"></DocumentTextIcon>
           <p className="text-base ">Autenticar documento</p>
         </Link>
-
-        <nav
+        <Link
+          href="/validate"
+          passHref
           tabIndex={0}
           className="flex w-full cursor-pointer flex-row gap-4 rounded-md p-4 hover:bg-neutral-100"
         >
           <DocumentTextIcon className="h-6 w-6"></DocumentTextIcon>
           <p className="text-base ">Validar autenticação do documento</p>
-        </nav>
+        </Link>
       </div>
     </div>
   )

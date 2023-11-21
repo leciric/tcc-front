@@ -1,10 +1,9 @@
-import { ptBR } from '@clerk/localizations'
-import { ClerkProvider } from '@clerk/nextjs'
 import { Inter } from 'next/font/google'
 
 import React from 'react'
 import 'react-toastify/dist/ReactToastify.css'
 import './globals.css'
+import { Providers } from '@/components/providers'
 
 // If loading a variable font, you don't need to specify the font weight
 const inter = Inter({ subsets: ['latin'] })
@@ -20,12 +19,12 @@ export default async function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <ClerkProvider localization={ptBR}>
-      <html lang="pt-br" className={inter.className}>
-        <body>
-          <div className="">{children}</div>
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="pt-br" className={inter.className}>
+      <body>
+        <div className="">
+          <Providers>{children}</Providers>
+        </div>
+      </body>
+    </html>
   )
 }
